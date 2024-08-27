@@ -26,16 +26,12 @@ class AbstractRepository(ABC, Generic[T]):
         raise NotImplementedError
     
     @abstractmethod
-    async def find_one(self, **filter_by) -> T | None:
+    async def find_one(self, filter_by) -> T | None:
         raise NotImplementedError
 
     @abstractmethod
     async def edit_one(self, id: int, data: dict) -> int:
         raise NotImplementedError
-    
-    # @abstractmethod
-    # async def bulk_update_by_external_ids(self, data: list[dict]):
-    #     raise NotImplementedError
     
     @abstractmethod
     async def bulk_insert(self, data: list[dict]) -> int:
@@ -45,10 +41,7 @@ class AbstractRepository(ABC, Generic[T]):
     async def get_count(self) -> int:
         raise NotImplementedError
     
-    # @abstractmethod
-    # async def get_id_from_external_ids(self, data: list[int]) -> list[int]:
-    #     raise NotImplementedError
-    
+
 
 class SQLAlchemyRepository(AbstractRepository[T]):
     
@@ -67,7 +60,7 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         res = await self.async_session.scalars(stmt)
 
         return res.all()
-    
+
     async def get_all_fitered_or(self, filter_by: list):
         stmt = select(self.model).filter(
             or_(
@@ -79,7 +72,7 @@ class SQLAlchemyRepository(AbstractRepository[T]):
 
         return res.all()
 
-    async def find_one(self, **filter_by):
+    async def find_one(self, filter_by):
         stmt = select(self.model).filter_by(**filter_by)
         res = await self.async_session.execute(stmt)
 
@@ -90,18 +83,6 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         res = await self.async_session.execute(stmt)
         return res.scalar_one()
 
-    # async def bulk_update_by_external_ids(self, data: list[dict]) -> int:
-    #     for item in data:
-    #         stmt = (
-    #             update(self.model).
-    #             where(self.model.external_id == item["external_id"]).
-    #             values(**item)
-    #         )
-        
-    #         await self.async_session.execute(stmt)
-         
-    #     return 0
-        
     async def bulk_insert(self, data: list[dict]) -> int:
         stmt = (
             insert(self.model),
@@ -119,34 +100,3 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         res = await self.async_session.execute(stmt)
         c = res.scalar_one()
         return c
-
-    # async def get_existing_external_ids(self, external_ids: list[int]) -> set[int]:
-    #     stmt = (
-    #         select(self.model.external_id).
-    #         where(self.model.external_id.in_(external_ids))
-    #     )
-
-    #     res = await self.async_session.execute(stmt)
-
-    #     return set(res.scalars().all())
-    
-    # async def get_all_external_ids(self) -> Sequence[int]:
-    #     stmt = (
-    #         select(self.model.external_id)
-    #     )
-    #     res = await self.async_session.execute(stmt)
-    #     return res.scalars().all()
-    
-    # async def get_all_external_ids_filtered(self, **kwargs) -> Sequence[int]:
-    #     stmt = (
-    #         select(self.model.external_id).filter_by(**kwargs)
-    #     )
-    #     res = await self.async_session.execute(stmt)
-    #     return res.scalars().all()
-    
-    # async def bulk_delete(self, ids_lsit: list[int]) -> int:
-    #     stmt = (
-    #         delete(self.model).where(self.model.external_id.in_(ids_lsit))
-    #     )
-    #     res = await self.async_session.execute(stmt)
-    #     return 0

@@ -1,45 +1,91 @@
+from datetime import datetime
+
 from utils.logger import log
 
-from app.schemas.event_schema import EventPostSchema
-from app.services.services_helper import with_uow
-from app.utils.unit_of_work import AbstractUnitOfWork
+from app.db.models.event import Event
+from app.repositories.event_repository import EventFullyJoinSequence
+from app.schemas.event_schema import (EventFullyJoined, EventGetSchema,
+                                      EventPostSchema, PaginatedEvents)
+from app.schemas.general import Pagination
+from app.schemas.status_history_schema import StstusHistoryPost
+from app.services.services_helper import with_repository_manager
+from app.utils.repository_transaction_managaer import \
+    AbstractRepositoryTransactionManagaer
 
 
 class EventService():
-    def __init__(self, uow: AbstractUnitOfWork):
-        self.uow = uow
+    def __init__(self, repository_manager: AbstractRepositoryTransactionManagaer):
+        self.repository_manager = repository_manager
     
-    @with_uow
-    async def insert(self, event: EventPostSchema) -> int:
+    @with_repository_manager
+    async def insert(self, event: EventPostSchema, user_id: int | None, status_id: int, created: str) -> int | None:
         """
         Event inserting
         """
         try:
-            event_id = await self.uow.event_repo.insert(event.model_dump())
-            await self.uow.commit()
+            event_id = await self.repository_manager.event_repo.insert(event.model_dump())
+            dt = datetime.fromisoformat(created)
+            start_status_history_record = StstusHistoryPost(
+                created_at=dt,
+                user_id=user_id,
+                event_id=event_id,
+                status_id=status_id,
+            )
+            status_id = await self.repository_manager.status_history_repo.insert(start_status_history_record.model_dump())
+            await self.repository_manager.commit()
         except Exception as e:
             log.error(f"Some error occurred: {e}")
-            return 1
+            return None
         
-        log.info(f"Event was")
+        log.info(f"Event was created")
         return event_id
+    
+    @with_repository_manager
+    async def find_one(self, **filter: int) -> EventGetSchema | None:
+        try:
+            event : Event | None = await self.repository_manager.event_repo.find_one(filter)
 
-    # @with_uow
-    # async def bulk_update(self, elements_update: list[BuildingPostSchema]) -> int:
-    #     """
-    #     Buildings updating
-    #     """
-    #     elements_data_for_updating = [e.model_dump() for e in elements_update]
-    #     try:
-    #         await self.uow.buildings_repo.bulk_update_by_external_ids(elements_data_for_updating)
-    #         await self.uow.commit()
-    #     except Exception as e:
-    #         logger.error(f"Some error occurred: {e}")
-    #         return 1
-        
-    #     logger.info(f"Buildings between {elements_update[0].external_id}-{elements_update[-1].external_id} were updated")
-    #     return 0                 
+            if not event:
+                return None
+            
+            return EventGetSchema.model_validate(event)
+        except Exception as er:
+            log.error(f"Some error while finding event: {er}")
 
-    # @with_uow
-    # async def get_existing_external_ids(self, ids: list[int]) -> set[int]:
-    #     return await self.uow.buildings_repo.get_existing_external_ids(ids)
+    @with_repository_manager
+    async def get_events_pagination_filters(self, pagination: Pagination, **filter_by) -> PaginatedEvents | None:
+        try:
+            events_fully_joined: EventFullyJoinSequence = await self.repository_manager.event_repo.get_filtered_with_last_status(pagination.per_page, pagination.page, **filter_by)
+            count: int = await self.repository_manager.event_repo.get_count()
+            if events_fully_joined == []:
+                return PaginatedEvents(
+                    per_page=pagination.per_page,
+                    page=pagination.page,
+                    total_count=count,
+                    filtered=0,
+                    events=[]
+                )
+            else:
+                events: list[EventFullyJoined] = [
+                    EventFullyJoined(
+                        description=event.description,
+                        status=status_history.status,
+                        priority=priority.name,
+                        system=system.name,
+
+                        id=event.id,
+                        priority_id=event.priority_id,
+                        system_id=event.system_id,
+                    )
+                    for event, status_history, priority, system in events_fully_joined
+                ]
+
+                return PaginatedEvents(
+                    per_page=pagination.per_page,
+                    page=pagination.page,
+                    total_count=count,
+                    filtered=events.__len__(),
+                    events=events
+                ) 
+        except Exception as er:
+            log.error(f"Some error while finding event: {er}")

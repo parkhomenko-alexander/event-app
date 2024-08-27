@@ -9,5 +9,5 @@ class Event(Base):
     
     description: Mapped[str]
 
-    status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id"))
     priority_id: Mapped[int] = mapped_column(ForeignKey("priorities.id"))
+    system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))

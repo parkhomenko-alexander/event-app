@@ -2,6 +2,8 @@ from typing import List
 
 from fastapi import WebSocket
 
+from app.schemas.event_schema import EventGetSchema
+
 
 class WebSocketManager:
     def __init__(self):
@@ -14,8 +16,11 @@ class WebSocketManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def broadcast(self, message: str):
+    async def broadcast_event(self, event: EventGetSchema):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            await connection.send_text(event.model_dump_json())
+        
+    async def is_empty_connections_list(self) -> bool:
+        return True if self.active_connections == [] else False
 
 websocket_manager = WebSocketManager()

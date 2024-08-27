@@ -1,0 +1,16 @@
+[2024-08-26 16:58:49,662] event_service:33 :: ERROR   :: Some error occurred: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: datetime.datetime(2024, 8, 26, 6, 58, 38... (can't subtract offset-naive and offset-aware datetimes)
+[SQL: INSERT INTO statuses_history (created, status_id, event_id, user_id) VALUES ($1::TIMESTAMP WITHOUT TIME ZONE, $2::INTEGER, $3::INTEGER, $4::INTEGER) RETURNING statuses_history.id]
+[parameters: (datetime.datetime(2024, 8, 26, 6, 58, 38, 345184, tzinfo=datetime.timezone.utc), 13, 7, None)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+[2024-08-26 17:01:08,992] event_service:33 :: ERROR   :: Some error occurred: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: datetime.datetime(2024, 8, 26, 7, 0, 6, ... (can't subtract offset-naive and offset-aware datetimes)
+[SQL: INSERT INTO statuses_history (created, status_id, event_id, user_id) VALUES ($1::TIMESTAMP WITHOUT TIME ZONE, $2::INTEGER, $3::INTEGER, $4::INTEGER) RETURNING statuses_history.id]
+[parameters: (datetime.datetime(2024, 8, 26, 7, 0, 6, 267829, tzinfo=datetime.timezone.utc), 13, 8, None)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+[2024-08-26 17:37:08,674] kafka_consumer:74 :: INFO    :: Consumer stop
+[2024-08-26 17:37:12,431] kafka_consumer:44 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 17:39:59,504] event_service:36 :: INFO    :: Event was created
+[2024-08-26 17:40:04,868] kafka_consumer:64 :: INFO    :: conn exists
+[2024-08-26 17:40:53,598] kafka_consumer:74 :: INFO    :: Consumer stop
+[2024-08-26 17:40:56,915] kafka_consumer:44 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 17:41:31,208] ws_api:10 :: INFO    :: adsad
+[2024-08-26 17:41:38,537] event_service:36 :: INFO    :: Event was created

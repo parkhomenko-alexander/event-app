@@ -1,12 +1,10 @@
 from fastapi import APIRouter, WebSocket
 
+from app.utils.logger import log
 from app.ws.websocket_handlers import websocket_handler
 
-router = APIRouter(
-    tags=['ws-api'],
-    prefix="/ws"
-)
+ws_router = APIRouter()
 
-@router.websocket("/")
+@ws_router.websocket("/")
 async def websocket_route(websocket: WebSocket):
-    await websocket_handler(websocket)
+    await websocket_handler(websocket) 

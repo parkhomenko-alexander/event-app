@@ -1,0 +1,20 @@
+[2024-08-26 15:21:44,921] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:21:48,870] priority_service:37 :: ERROR   :: Some error occurred: Multiple rows were found when one or none was required
+[2024-08-26 15:21:48,967] priority_service:28 :: INFO    :: Priorities were inserted
+[2024-08-26 15:21:49,453] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:23:15,200] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:23:20,200] priority_service:37 :: ERROR   :: Some error occurred: Multiple rows were found when one or none was required
+[2024-08-26 15:23:20,285] priority_service:28 :: INFO    :: Priorities were inserted
+[2024-08-26 15:23:20,768] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:24:12,169] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:24:23,353] priority_service:37 :: ERROR   :: Some error occurred: Multiple rows were found when one or none was required
+[2024-08-26 15:24:50,353] priority_service:37 :: ERROR   :: Some error occurred: Multiple rows were found when one or none was required
+[2024-08-26 15:25:28,042] priority_service:28 :: INFO    :: Priorities were inserted
+[2024-08-26 15:25:28,741] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:25:54,288] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:26:10,235] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:26:54,694] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:27:06,472] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:32:23,615] kafka_consumer:66 :: INFO    :: Consumer stop
+[2024-08-26 15:33:00,130] kafka_consumer:42 :: INFO    :: Consumer started and listening for messages...
+[2024-08-26 15:33:23,326] kafka_consumer:66 :: INFO    :: Consumer stop
