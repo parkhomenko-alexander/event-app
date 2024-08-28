@@ -3,7 +3,7 @@ from typing import Sequence
 
 from app.db.models.system import System
 from app.db.models.user import User
-from app.schemas.user_schema import UserGetSchema, UserPostSchema
+from app.schemas.user_schemas import UserGetSchema, UserPostSchema
 from app.utils.logger import log
 from app.utils.repository_transaction_managaer import \
     AbstractRepositoryTransactionManagaer

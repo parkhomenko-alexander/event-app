@@ -15,7 +15,7 @@ def setup_logging(logger_path, logger_filename):
         log_file_path = os.path.join(root_dir, logger_path, logger_filename)
         
         console_handler = logging.StreamHandler()
-        file_handler = RotatingFileHandler(log_file_path, maxBytes=2000, backupCount=10)
+        file_handler = RotatingFileHandler(log_file_path, maxBytes=200000, backupCount=10)
         
         console_handler.setLevel(logging.INFO)
         file_handler.setLevel(logging.INFO)

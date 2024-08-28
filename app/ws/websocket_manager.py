@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import WebSocket
 
-from app.schemas.event_schema import EventGetSchema
+from app.schemas.event_schemas import EventGetSchema
 
 
 class WebSocketManager:

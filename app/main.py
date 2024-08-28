@@ -1,5 +1,4 @@
 import asyncio
-import threading
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -7,7 +6,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api_v1 import router as router_v1
-from app.api_v1.ws.ws_api import ws_router
 from app.db import Base, db
 from app.db.initial_data import init_db
 from app.utils.kafka_consumer import consume_events

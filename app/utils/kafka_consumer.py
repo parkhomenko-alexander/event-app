@@ -3,7 +3,8 @@ import json
 from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaError, NoBrokersAvailable
 
-from app.schemas.event_schema import EventGetSchema, EventPostSchema
+from app.schemas.event_schemas import (EventFullyJoinedSchema, EventGetSchema,
+                                       EventPostSchema)
 from app.services.event_service import EventService
 from app.services.priority_service import PriorityService
 from app.services.status_service import StatusService
@@ -61,12 +62,11 @@ async def consume_events():
                 )
 
                 if event_id and not await websocket_manager.is_empty_connections_list():
-                    event_get: EventGetSchema | None = await event_service.find_one(id=event_id)
+                    event_get: EventFullyJoinedSchema | None = await event_service.get_event_joined(id=event_id)
                     if event_get is None:
                         continue
                     await websocket_manager.broadcast_event(event_get)
 
-                    
 
     except NoBrokersAvailable as e:
         log.error(f"Kafka broker not available: {e}")

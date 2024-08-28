@@ -1,4 +1,4 @@
-from app.schemas.user_schema import UserPostSchema
+from app.schemas.user_schemas import UserPostSchema
 from app.services.priority_service import PriorityService
 from app.services.status_service import StatusService
 from app.services.system_service import SystemService

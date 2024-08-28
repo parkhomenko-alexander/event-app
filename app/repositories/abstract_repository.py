@@ -100,3 +100,18 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         res = await self.async_session.execute(stmt)
         c = res.scalar_one()
         return c
+
+    async def get_filtered_ids_with_pagination(self, per_page: int = 20, page: int = 1, **filter_by) -> list[int]:
+        offset = (page - 1) * per_page
+
+        stmt = (
+            select(self.model.id)
+            .filter_by(**filter_by)
+            .offset(offset)
+            .limit(per_page)
+        )
+
+        query_res = await self.async_session.execute(stmt)
+        issue_ids = [row[0] for row in query_res.all()]
+
+        return issue_ids
