@@ -11,3 +11,6 @@ class Event(Base):
 
     priority_id: Mapped[int] = mapped_column(ForeignKey("priorities.id"))
     system_id: Mapped[int] = mapped_column(ForeignKey("systems.id"))
+
+    building_id: Mapped[int | None] 
+    room_id: Mapped[int | None]

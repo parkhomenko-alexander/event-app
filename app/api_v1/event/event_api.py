@@ -1,8 +1,7 @@
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
-from app.api_v1.dependencies import (EventServiceDep, PaginationDep,
-                                     RepositoryTransactionManagerDep)
+from app.api_v1.dependencies import EventServiceDep, PaginationDep
 from app.schemas.event_schemas import PaginatedEventsSchema
 from app.utils.logger import log
 
@@ -11,7 +10,7 @@ router = APIRouter(
 )
 
 @router.get(
-    '/',
+    '',
     response_model=PaginatedEventsSchema
 )
 async def get_events(
@@ -25,15 +24,15 @@ async def get_events(
         log.error(f"Error occurred: {er}" )
 
 
-@router.post(
-    '/',
-)
-async def create_event(
-    uow: RepositoryTransactionManagerDep,
-    request: Request,
-):
-    log.info("events get")
-    return {"id": 123}
+# @router.post(
+#     '',
+# )
+# async def create_event(
+#     uow: RepositoryTransactionManagerDep,
+#     request: Request,
+# ):
+#     log.info("events get")
+#     return {"id": 123}
 
 
 

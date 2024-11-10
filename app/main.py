@@ -8,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api_v1 import router as router_v1
 from app.db import Base, db
 from app.db.initial_data import init_db
+from app.settings import config
+from app.utils.building_cache import update_chache
 from app.utils.kafka_consumer import consume_events
-from app.utils.logger import log
-from settings import config
 
 
 @asynccontextmanager
@@ -19,18 +19,9 @@ async def lifespan(app: FastAPI):
         await async_conn.run_sync(Base.metadata.create_all)
     await init_db()
 
-    # Start the Kafka consumer
-    consumer_task = asyncio.create_task(consume_events())
+    asyncio.create_task(update_chache(1000))
+    asyncio.create_task(consume_events())
     yield
-    # Shutdown Kafka consumer
-    consumer_task.cancel()
-    try:
-        await consumer_task
-    except asyncio.CancelledError:
-        pass
-    except Exception as er:
-        log.error("xczxcz") 
-
 
 
 app = FastAPI(
@@ -38,14 +29,15 @@ app = FastAPI(
     root_path=config.APPLICATION_PREFIX_BEHIND_PROXY,
 )
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-) 
- 
+)
+
 app.include_router(router=router_v1)
 # app.include_router(router=router_v1, prefix=config.api_v1_prefix)
 

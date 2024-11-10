@@ -1,7 +1,6 @@
 
 from typing import Sequence
 
-from app.db.models.system import System
 from app.db.models.user import User
 from app.schemas.user_schemas import UserGetSchema, UserPostSchema
 from app.utils.logger import log
@@ -12,7 +11,7 @@ from app.utils.repository_transaction_managaer import \
 class UserService():
     def __init__(self, repository_manager: AbstractRepositoryTransactionManagaer):
         self.repository_manager = repository_manager
-    
+
     @staticmethod 
     async def insert(repository_manager: AbstractRepositoryTransactionManagaer, user_post: UserPostSchema) -> int | None:
         async with repository_manager:
@@ -24,7 +23,6 @@ class UserService():
                 return None
 
             return user_id
-     
 
     @staticmethod
     async def find_one(repository_manager: AbstractRepositoryTransactionManagaer, **filters) -> UserGetSchema | None:
@@ -45,7 +43,7 @@ class UserService():
                 tz=user.tz,
                 id=user.id
             )
-    
+
     @staticmethod 
     async def get_mail_id_mapping(repository_manager: AbstractRepositoryTransactionManagaer) -> dict[str, int] | None:
         async with repository_manager:

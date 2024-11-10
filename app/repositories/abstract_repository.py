@@ -16,15 +16,15 @@ class AbstractRepository(ABC, Generic[T]):
     @abstractmethod
     async def insert(self, data: dict) -> int:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def get_all(self) -> Sequence[T]:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def get_all_fitered_or(self, filter_by: list) -> Sequence[T]:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def find_one(self, filter_by) -> T | None:
         raise NotImplementedError
@@ -32,19 +32,19 @@ class AbstractRepository(ABC, Generic[T]):
     @abstractmethod
     async def edit_one(self, id: int, data: dict) -> int:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def bulk_insert(self, data: list[dict]) -> int:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def get_count(self) -> int:
         raise NotImplementedError
-    
+
 
 
 class SQLAlchemyRepository(AbstractRepository[T]):
-    
+
     def __init__(self, async_session: AsyncSession, model: Type[T]):
         self.async_session = async_session
         self.model = model
@@ -91,7 +91,7 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         
         res = await self.async_session.execute(*stmt)
         return 0
-    
+
     async def get_count(self) -> int:
         stmt = (
             count(self.model.id)

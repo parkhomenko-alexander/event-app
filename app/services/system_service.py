@@ -10,7 +10,7 @@ from app.utils.repository_transaction_managaer import \
 class SystemService():
     def __init__(self, repository_manager: AbstractRepositoryTransactionManagaer):
         self.repository_manager = repository_manager
-    
+
     @staticmethod
     async def bulk_insert(repository_manager: AbstractRepositoryTransactionManagaer, systems: list[str]) -> int | None:
         """
@@ -24,10 +24,10 @@ class SystemService():
             except Exception as e:
                 log.error(f"Some error occurred: {e}")
                 return None
-            
+
             log.info(f"Systems were inserted")
-            return 0                 
-        
+            return 0
+
     @staticmethod
     async def find_one(repository_manager: AbstractRepositoryTransactionManagaer, **filters) -> System | None:
         async with repository_manager:
@@ -36,7 +36,7 @@ class SystemService():
             except Exception as e:
                 log.error(f"Some error occurred: {e}")
                 return None
-            
+
             return system  
 
     @staticmethod 
@@ -52,6 +52,6 @@ class SystemService():
             except Exception as e:
                 log.error(f"Some error occurred while generate systems mapping: {e}")
                 return None
-            
+
             return mapping
 

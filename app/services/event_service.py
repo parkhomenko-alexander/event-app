@@ -1,31 +1,67 @@
 from datetime import datetime
 
-from utils.logger import log
-
 from app.db.models.event import Event
+from app.exeptions.event_exceptions import EventValidationError
 from app.repositories.event_repository import (EventFullyJoin,
                                                EventFullyJoinSequence)
 from app.schemas.event_schemas import (EventFullyJoinedSchema, EventGetSchema,
-                                       EventPostSchema, PaginatedEventsSchema)
+                                       EventPostSchema, PaginatedEventsSchema,
+                                       RawEventInfoSchema)
 from app.schemas.general import Pagination
 from app.schemas.status_history_schemas import StstusHistoryPost
 from app.services.services_helper import with_repository_manager
+from app.utils.building_cache import BuildingCache
+from app.utils.logger import log
+from app.utils.redis_manager import CachePrefixes, RedisManager
 from app.utils.repository_transaction_managaer import \
     AbstractRepositoryTransactionManagaer
 
 
 class EventService():
-    def __init__(self, repository_manager: AbstractRepositoryTransactionManagaer):
-        self.repository_manager = repository_manager
+    def __init__(self, repository_manager: AbstractRepositoryTransactionManagaer, building_cache: BuildingCache):
+        self.repository_manager: AbstractRepositoryTransactionManagaer = repository_manager
+        self.building_cache: BuildingCache = building_cache
     
     @with_repository_manager
-    async def insert(self, event: EventPostSchema, user_id: int | None, status_id: int, created: str) -> int | None:
+    async def validate_event(
+        self,
+        event: RawEventInfoSchema,
+        prior_mapping: dict[str, int],
+        system_mapping: dict[str, int],
+    ) -> EventPostSchema:
+        """
+        Event validationg
+        """
+        prior = event.priority
+        prior_id = prior_mapping.get(prior, None)
+        if not prior_id:
+            raise EventValidationError("Wrong priority: {prior}")
+
+        system = event.system
+        system_id = system_mapping.get(system, None)
+        if not system_id:
+            raise EventValidationError("Wrong priority: {system}")
+
+
+        building_id, room_id = self.building_cache.get_building_room_ids(event.building_title, event.room_title)
+
+        return EventPostSchema(
+            description=event.description,
+            system_id=system_id,
+            priority_id=prior_id,
+            building_id=building_id,
+            room_id=room_id,
+        )
+
+    @with_repository_manager
+    async def insert(self, event: EventPostSchema, user_id: int | None, status_id: int, created_at: str) -> int | None:
         """
         Event inserting
         """
         try:
             event_id = await self.repository_manager.event_repo.insert(event.model_dump())
-            dt = datetime.fromisoformat(created)
+
+            dt = datetime.fromisoformat(created_at)
             start_status_history_record = StstusHistoryPost(
                 created_at=dt,
                 user_id=user_id,
@@ -54,26 +90,32 @@ class EventService():
             log.error(f"Some error while finding event: {er}")
 
     @with_repository_manager
-    async def get_event_joined(self, **filter_by) -> EventFullyJoinedSchema | None: 
+    async def get_event_joined(self, event_id: int) -> EventFullyJoinedSchema | None: 
         try:
-            joined_event_row: EventFullyJoin = await self.repository_manager.event_repo.get_event_joined(**filter_by)
-            if joined_event_row is None:
-                log.info(f"Event with id {filter_by} not found")
-                return 1
-                # return None
+            joined_event_row: EventFullyJoin = await self.repository_manager.event_repo.get_event_joined(event_id)
 
-            event, priority, system, first_status, last_status = joined_event_row
+            if joined_event_row is None:
+                log.info(f"Event with id {event_id} not found")
+                return None
+
+            event, priority, system, first_status_history, last_status, last_status_history = joined_event_row
+
+            building, room = self.building_cache.get_building_room_title(event.building_id, event.room_id)
 
             return EventFullyJoinedSchema(
                 description=event.description,
                 priority=priority.title,
                 system=system.title,
                 last_status=last_status.title,
-                creted_at=first_status.created_at,
-                updated_at=last_status.created_at,
+                created_at=first_status_history.created_at,
+                updated_at=last_status_history.created_at,
                 id=event.id,
                 priority_id=event.priority_id,
                 system_id=event.system_id,
+                building_id=event.building_id,
+                room_id=event.room_id,
+                building=building,
+                room=room
             )
         
         except Exception as er:
@@ -94,20 +136,27 @@ class EventService():
                 )
             else:
                 joined_events: EventFullyJoinSequence = await self.repository_manager.event_repo.get_filtered_events_with_pagination(events_ids)
-                events: list[EventFullyJoinedSchema] = [
-                    EventFullyJoinedSchema(
-                        description=event.description,
-                        priority=priority.title,
-                        system=system.title,
-                        last_status=last_status.title,
-                        creted_at=first_status_history.created_at,
-                        updated_at=last_status_history.created_at,
-                        id=event.id,
-                        priority_id=event.priority_id,
-                        system_id=event.system_id,
-                    )
-                    for event, priority, system, first_status, first_status_history, last_status, last_status_history in joined_events
-                ]
+                events: list[EventFullyJoinedSchema] = []
+                for event, priority, system, first_status_history, last_status, last_status_history in joined_events:
+                    building, room = self.building_cache.get_building_room_title(event.building_id, event.room_id)
+
+                    events.append(
+                            EventFullyJoinedSchema(
+                            description=event.description,
+                            priority=priority.title,
+                            system=system.title,
+                            last_status=last_status.title,
+                            created_at=first_status_history.created_at,
+                            updated_at=last_status_history.created_at,
+                            id=event.id,
+                            priority_id=event.priority_id,
+                            system_id=event.system_id,
+                            building_id=event.building_id,
+                            room_id=event.room_id,
+                            building=building,
+                            room=room
+                            )
+                        )
 
                 return PaginatedEventsSchema(
                     per_page=pagination.per_page,

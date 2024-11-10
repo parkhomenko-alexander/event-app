@@ -35,7 +35,3 @@ async def init_db(statuses=STATUSES, priorities=PRIORITIES, systems=SYSYTEMS):
 
     if not await UserService.find_one(uow, mail="parkhomenko.av@dvfu.ru"):
         await UserService.insert(uow, ADMIN_USER)
-
-
-
-        
