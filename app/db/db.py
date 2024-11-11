@@ -23,4 +23,4 @@ class Database:
     def get_async_sessionmaker(self) -> async_sessionmaker:
         return self.async_session_factory
 
-db: Database = Database(config.get_db_uri(), config.DB_ECHO) 
+db: Database = Database(config.get_db_uri(), config.POSTGRES_ECHO) 

@@ -16,14 +16,14 @@ class ApplicationSettings(BaseSettings):
     APPLICATION_PREFIX_BEHIND_PROXY: str = "" 
     APPLICATION_API_PREFIX: str = "" 
 
-    DB_DIALECT: str = ""
-    DB_DRIVER: str = ""
-    DB_USER: str = ""
-    DB_PASSWORD: str = ""
-    DB_HOST: str = ""
-    DB_PORT: str = ""
-    DB_DBNAME: str = ""
-    DB_ECHO: bool = False 
+    POSTGRES_DIALECT: str = ""
+    POSTGRES_DRIVER: str = ""
+    POSTGRES_USER: str = ""
+    POSTGRES_PASSWORD: str = ""
+    POSTGRES_HOST: str = ""
+    POSTGRES_PORT: str = ""
+    POSTGRES_DB: str = ""
+    POSTGRES_ECHO: bool = False 
 
     REDIS_HOST: str = ""
     REDIS_PORT: int = 0
@@ -40,7 +40,7 @@ class ApplicationSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=DOTENV)
 
     def get_db_uri(self) -> str:
-        return f"{self.DB_DIALECT}+{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_DBNAME}"
+        return f"{self.POSTGRES_DIALECT}+{self.POSTGRES_DRIVER}://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     def get_redis_buildings_cache_uri(self) -> str:
         return f"redis://{self.REDIS_AMELIA_CACHE_HOST}:{self.REDIS_AMELIA_CACHE_PORT}/{self.REDIS_AMELIA_CACHE_DB}"
