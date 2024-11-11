@@ -7,8 +7,8 @@ from settings import config
 
 def setup_logging(logger_path, logger_filename):
 
-    # if not os.path.exists(config.APPLICATION_LOGGER_PATH):
-    #     os.makedirs(config.APPLICATION_LOGGER_PATH)
+    if not os.path.exists(config.APPLICATION_LOGGER_PATH):
+        os.makedirs(config.APPLICATION_LOGGER_PATH)
 
     logger = logging.getLogger("events_application_sitcenter")
     
