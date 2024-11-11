@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
         await async_conn.run_sync(Base.metadata.create_all)
     await init_db()
 
-    asyncio.create_task(update_chache(1000))
+    asyncio.create_task(update_chache(86400))
     asyncio.create_task(consume_events())
     yield
 

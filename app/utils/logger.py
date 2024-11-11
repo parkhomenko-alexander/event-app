@@ -1,3 +1,4 @@
+
 import logging
 import os
 from logging.handlers import RotatingFileHandler
@@ -11,6 +12,9 @@ def setup_logging(logger_path, logger_filename):
         os.makedirs(config.APPLICATION_LOGGER_PATH)
 
     logger = logging.getLogger("events_application_sitcenter")
+
+    if logger.hasHandlers():
+        logger.handlers.clear()
     
     logger.setLevel(logging.INFO)
     if not logger.hasHandlers(): 
@@ -33,7 +37,6 @@ def setup_logging(logger_path, logger_filename):
         logger.addHandler(console_handler)
         logger.addHandler(file_handler)
         logger.propagate = False
-
     return logger
 
 log = setup_logging(config.APPLICATION_LOGGER_PATH, config.APPLICATION_LOGGER_FILENAME)
