@@ -5,8 +5,8 @@ from json import loads
 from redis import RedisError
 from redis.asyncio import Redis
 
-from app.settings import config
 from app.utils.logger import log
+from settings import config
 
 
 class CachePrefixes(Enum):

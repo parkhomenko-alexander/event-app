@@ -3,7 +3,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
-from app.settings import config
+from settings import config
 
 
 def setup_logging(logger_path, logger_filename):

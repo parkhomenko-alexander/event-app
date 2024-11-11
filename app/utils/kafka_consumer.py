@@ -11,12 +11,12 @@ from app.services.priority_service import PriorityService
 from app.services.status_service import StatusService
 from app.services.system_service import SystemService
 from app.services.user_service import UserService
-from app.settings import config
 from app.utils import building_cache, repository_transaction_managaer
 from app.utils.building_cache import get_building_cache
 from app.utils.logger import log
 from app.utils.redis_manager import RedisManager
 from app.ws.websocket_manager import websocket_manager
+from settings import config
 
 
 def deserialize_event(event_bytes) -> RawEventInfoSchema:

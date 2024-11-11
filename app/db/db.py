@@ -2,7 +2,7 @@ from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import (AsyncEngine, async_sessionmaker,
                                     create_async_engine)
 
-from app.settings import config
+from settings import config
 
 
 class Database:
@@ -12,7 +12,7 @@ class Database:
             echo=echo,
             poolclass=NullPool
         )
-    
+
         self.async_session_factory: async_sessionmaker = async_sessionmaker(
             bind=self.engine,
             autoflush=False,
