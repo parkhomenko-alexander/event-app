@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-config.set_main_option("sqlalchemy.url", app_cfg.DB_URI + "?async_fallback=True")
+config.set_main_option("sqlalchemy.url", app_cfg.get_db_uri() + "?async_fallback=True")
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
