@@ -32,3 +32,6 @@ archive.zip
 logs/
 
 app/celery/temp.py
+
+docker-compose.yaml
+.env
