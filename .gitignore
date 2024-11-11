@@ -35,3 +35,4 @@ app/celery/temp.py
 
 docker-compose.yaml
 .env
+.env.prod
