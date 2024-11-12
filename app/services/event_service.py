@@ -12,7 +12,6 @@ from app.schemas.status_history_schemas import StstusHistoryPost
 from app.services.services_helper import with_repository_manager
 from app.utils.building_cache import BuildingCache
 from app.utils.logger import log
-from app.utils.redis_manager import CachePrefixes, RedisManager
 from app.utils.repository_transaction_managaer import \
     AbstractRepositoryTransactionManagaer
 
