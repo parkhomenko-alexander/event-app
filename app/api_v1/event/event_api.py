@@ -1,4 +1,5 @@
 
+from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, HTTPException
 
 from app.api_v1.dependencies import EventServiceDep, PaginationDep
@@ -8,7 +9,7 @@ from app.utils.logger import log
 from settings import config
 
 router = APIRouter(
-    tags=['Event']
+    tags=['Events']
 )
 
 @router.get(
@@ -32,7 +33,7 @@ async def get_events(
 async def test_kafka_workflow(
     external_event: RawEventInfoSchema
 ):
-    producer = None
+    producer: None | AIOKafkaProducer = None
     try:
         producer = await create_producer()
         await producer.send(config.KAFKA_TOPIC_NAME_EVENTS, value=external_event.model_dump())
