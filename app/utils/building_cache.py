@@ -74,6 +74,7 @@ class BuildingCache:
             if cls._instance:
                 cls.building_cache["title_id_building_cache"] = title_id_building_cache
                 cls.building_cache["id_title_building_cache"] = id_title_building_cache
+            log.info(cls.building_cache["title_id_building_cache"]["Корпус B"])
         except Exception as e:
             log.exception(f"An error occurred: {e}")
             cls.building_cache = {
