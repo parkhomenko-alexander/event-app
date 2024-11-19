@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import WebSocket
 
-from app.schemas.event_schemas import EventGetSchema
+from app.schemas.event_schemas import EventFullyJoinedSchema, EventGetSchema
 
 
 class WebSocketManager:
@@ -16,7 +16,7 @@ class WebSocketManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def broadcast_event(self, event: EventGetSchema):
+    async def broadcast_event(self, event: EventFullyJoinedSchema):
         for connection in self.active_connections:
             await connection.send_text(event.model_dump_json())
         

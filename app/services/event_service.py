@@ -123,7 +123,11 @@ class EventService():
     @with_repository_manager
     async def get_events_joined_pagination_filters(self, pagination: Pagination, **filter_by) -> PaginatedEventsSchema | None:
         try:
-            events_ids: list[int] = await self.repository_manager.event_repo.get_filtered_ids_with_pagination(pagination.per_page, pagination.page, **filter_by)
+            sort_by: str = filter_by.pop("sort_by", "id")
+            if sort_by == "created_at": #! TODO CREATED_AT sorting
+                sort_by = "id"
+            sort_order: str = filter_by.pop("sort_order", "desc")
+            events_ids: list[int] = await self.repository_manager.event_repo.get_filtered_ids_with_pagination(pagination.per_page, pagination.page, sort_by, sort_order, **filter_by)
             count: int = await self.repository_manager.event_repo.get_count()
             if events_ids == []:
                 return PaginatedEventsSchema(
@@ -134,7 +138,7 @@ class EventService():
                     events=[]
                 )
             else:
-                joined_events: EventFullyJoinSequence = await self.repository_manager.event_repo.get_filtered_events_with_pagination(events_ids)
+                joined_events: EventFullyJoinSequence = await self.repository_manager.event_repo.get_filtered_events_with_pagination(events_ids, sort_by, sort_order,)
                 events: list[EventFullyJoinedSchema] = []
                 for event, priority, system, first_status_history, last_status, last_status_history in joined_events:
                     building, room = self.building_cache.get_building_room_title(event.building_id, event.room_id)

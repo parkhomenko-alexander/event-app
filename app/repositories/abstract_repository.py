@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, Optional, Sequence, Type, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import delete, insert, or_, select, update
+from sqlalchemy import asc, delete, desc, insert, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import count
 
@@ -101,12 +101,21 @@ class SQLAlchemyRepository(AbstractRepository[T]):
         c = res.scalar_one()
         return c
 
-    async def get_filtered_ids_with_pagination(self, per_page: int = 20, page: int = 1, **filter_by) -> list[int]:
+    async def get_filtered_ids_with_pagination(self, per_page: int = 20, page: int = 1, sort_by: str = "id", sort_order: str = "desc", **filter_by) -> list[int]:
         offset = (page - 1) * per_page
+
+        match sort_order.lower():
+            case "asc":
+                sort_predicate = asc(getattr(self.model, sort_by, Base.id))
+            case "desc":
+                sort_predicate = desc(getattr(self.model, sort_by, Base.id))
+            case _:
+                raise ValueError(f"Invalid sort_order: {sort_order}. Must be 'asc' or 'desc'.")
 
         stmt = (
             select(self.model.id)
             .filter_by(**filter_by)
+            .order_by(sort_predicate)
             .offset(offset)
             .limit(per_page)
         )

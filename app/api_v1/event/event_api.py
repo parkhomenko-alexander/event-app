@@ -2,7 +2,7 @@
 from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, HTTPException
 
-from app.api_v1.dependencies import EventServiceDep, PaginationDep
+from app.api_v1.dependencies import EventServiceDep, FiltersDep, PaginationDep
 from app.schemas.event_schemas import PaginatedEventsSchema, RawEventInfoSchema
 from app.utils.kafka_producer import create_producer
 from app.utils.logger import log
@@ -19,9 +19,10 @@ router = APIRouter(
 async def get_events(
     event_service: EventServiceDep,
     pagination: PaginationDep,
+    filters: FiltersDep
 ):
     try:
-        events_with_pagination = await event_service.get_events_joined_pagination_filters(pagination)
+        events_with_pagination = await event_service.get_events_joined_pagination_filters(pagination, **filters.model_dump())
         return events_with_pagination
     except Exception as er:
         log.error(f"Error occurred: {er}" )

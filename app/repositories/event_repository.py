@@ -1,6 +1,7 @@
 from typing import Sequence, TypeAlias
 
-from sqlalchemy import CTE, Result, Row, Select, Subquery, func, select
+from sqlalchemy import (CTE, Result, Row, Select, Subquery, asc, desc, func,
+                        select)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -73,13 +74,21 @@ class EventRepository(SQLAlchemyRepository[Event]):
 
         return res
 
-    async def get_filtered_events_with_pagination(self, events_ids: list[int]) -> EventFullyJoinSequence:
+    async def get_filtered_events_with_pagination(self, events_ids: list[int], sort_by: str = "id", sort_order: str = "desc",) -> EventFullyJoinSequence:
         first_status_history = aliased(StatusHistory)
         last_status_history = aliased(StatusHistory)
 
         first_status = aliased(Status)
         last_status = aliased(Status)
-        
+
+        match sort_order.lower():
+            case "asc":
+                sort_predicate = asc(getattr(self.model, sort_by, Event.id))
+            case "desc":
+                sort_predicate = desc(getattr(self.model, sort_by, Event.id))
+            case _:
+                raise ValueError(f"Invalid sort_order: {sort_order}. Must be 'asc' or 'desc'.")
+            
         first_statuses_aggregation: Subquery = (
             select(
                 func.min(first_status_history.id).label("first_status_id")
@@ -131,7 +140,8 @@ class EventRepository(SQLAlchemyRepository[Event]):
             .join(System, System.id == self.model.system_id)
             .join(first_status_subquery, (first_status_subquery.c.event_id==self.model.id))
             .join(last_status_subquery, last_status_subquery.c.event_id == self.model.id)
+            .order_by(sort_predicate)
         )
-        
+
         query_res: Result[EventFullyJoinTuple] = await self.async_session.execute(stmt)
         return query_res.all()

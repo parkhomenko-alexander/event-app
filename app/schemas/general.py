@@ -11,7 +11,8 @@ class BaseUserModel(BaseModel):
         from_attributes=True,
         alias_generator=AliasGenerator(
             serialization_alias=to_camel,
-        ), extra="ignore"
+        ),
+        extra="ignore"
     )
 
 class Pagination(BaseUserModel):

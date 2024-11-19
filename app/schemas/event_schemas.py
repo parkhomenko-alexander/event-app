@@ -42,3 +42,7 @@ class PaginatedEventsSchema(BaseUserModel):
     page: int
     per_page: int
     events: list[EventFullyJoinedSchema]
+
+class EventsQueryFilters(BaseUserModel):
+    sort_by: str
+    sort_order: str
